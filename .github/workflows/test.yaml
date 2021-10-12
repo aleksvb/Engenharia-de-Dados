@@ -1,6 +1,6 @@
 name: Test on PR
 
-on: 
+on:
   pull_request:
     branches: [master]
 
@@ -8,7 +8,7 @@ jobs:
   test:
     name: Test infra on PR
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v2
 
@@ -17,15 +17,19 @@ jobs:
       with:
         python-version: 3.8
 
-    - name: Hashicorp - Setup Terraform
+    - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v1.2.1
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-        aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
+
+    - name: Build Lambda package
+      run: |
+        sh scripts/build_lambda_package.sh
 
     - name: IaC Apply
       env:
@@ -34,4 +38,4 @@ jobs:
         cd infrastructure
         $COMMAND_IAC init
         $COMMAND_IAC validate
-        $COMMAND_IAC plan        
+        $COMMAND_IAC plan
